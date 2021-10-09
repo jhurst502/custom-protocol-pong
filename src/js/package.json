@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/jhurst502/custom-protocol-pong#readme",
   "devDependencies": {
-    "electron": "^15.0.0"
+    "electron": "^15.1.0"
   }
 }
