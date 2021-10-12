@@ -4,7 +4,32 @@
 const { app, BrowserWindow } = require('electron')
 const path = require('path')
 
+  // Websocket
+  const WebSocket = require('ws');
+  let socket = new WebSocket("ws://localhost:8082");
+
+  socket.onopen = function(e) {
+    console.log("Sending to server");
+    socket.send("Testing123");
+  }
+
+  socket.onclose = function(event) {
+    if (event.wasClean) {
+      console.log(`[close] Connection closed cleanly, code=${event.code} reason=${event.reason}`);
+    } else {
+      // e.g. server process killed or network down
+      // event.code is usually 1006 in this case
+      console.log('[close] Connection died');
+    }
+  };
+
+  socket.onerror = function(error) {
+    console.log(`[error] ${error.message}`);
+  };
+
+
 function createWindow () {
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,

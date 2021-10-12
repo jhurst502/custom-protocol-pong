@@ -19,5 +19,8 @@
   "homepage": "https://github.com/jhurst502/custom-protocol-pong#readme",
   "devDependencies": {
     "electron": "^15.1.0"
+  },
+  "dependencies": {
+    "ws": "^8.2.3"
   }
 }
