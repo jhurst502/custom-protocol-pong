@@ -1,4 +1,4 @@
-package sample;
+package src.Pong;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;

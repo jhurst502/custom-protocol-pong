@@ -1,9 +1,10 @@
-package sample;
+package src.Pong;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
+import src.Pong.Ball;
 
 
 public class Main extends Application {

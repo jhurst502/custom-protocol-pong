@@ -1,4 +1,4 @@
-package sample;
+package src.Pong;
 
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
