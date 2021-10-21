@@ -5,6 +5,8 @@
 ### Java ###
 # Compiled class file
 *.class
+/out
+/.idea
 
 # Log file
 *.log
@@ -204,5 +206,7 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+*.iml
 
 # End of https://www.toptal.com/developers/gitignore/api/java,node,macos,windows
