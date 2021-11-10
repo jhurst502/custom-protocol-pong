@@ -21,13 +21,6 @@ public class Ball extends Circle {
         setCenterY(y);
     }
 
-    public void startGame() {
-        Timeline animation = new Timeline(new KeyFrame(Duration.millis(50),
-                e -> moveBall()));
-        animation.setCycleCount(Timeline.INDEFINITE);
-        animation.play();
-    }
-
     public int getX() {
         return x;
     }
@@ -60,22 +53,8 @@ public class Ball extends Circle {
         this.yDirection = yDirection;
     }
 
-    private void moveBall() {
-        if (getCenterY() < 0 || getCenterY() > 300) {
-            yDirection *= -1;
-        }
-
-        xDirection -= 1;
-
-        x += xDirection;
-        y += yDirection;
-
-        if (getCenterX() < 0) {
-            x = 600;
-        }
-        setCenterX(x);
-        setCenterY(y);
+    public void center() {
+        this.x = 600/2; // Dont hardcode screen size
+        this.y = 350/2;
     }
-
-
 }

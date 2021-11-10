@@ -8,8 +8,12 @@ import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 
 public class Main extends Application {
+    private boolean playing = true;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -47,13 +51,6 @@ public class Main extends Application {
                 }));
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.play();
-
-        if (ball.getCenterX() > 600 || ball.getCenterX() < 0) {
-            System.out.println("Hey");
-            animation.stop();
-
-        }
-
     }
 
 
@@ -62,38 +59,52 @@ public class Main extends Application {
     }
 
     public void moveBall(Ball ball, Paddle p1, Paddle p2) throws Exception {
-        int yDirection = ball.getyDirection();
-        int xDirection = ball.getxDirection();
-        int x = ball.getX();
-        int y = ball.getY();
-        if (ball.getCenterY() < 0 || ball.getCenterY() > 300) {
-            ball.setyDirection(yDirection *= -1);
+        if (playing) {
+            int yDirection = ball.getyDirection();
+            int xDirection = ball.getxDirection();
+            int x = ball.getX();
+            int y = ball.getY();
+            if (ball.getCenterY() < 0 || ball.getCenterY() > 300) {
+                ball.setyDirection(yDirection *= -1);
+            }
+
+            x += xDirection;
+            y += yDirection;
+
+            ball.setX(x);
+            ball.setY(y);
+
+            ball.setCenterX(ball.getX());
+            ball.setCenterY(ball.getY());
+
+            if (ball.getLayoutBounds().intersects(p1.getLayoutBounds()) || ball.getLayoutBounds().intersects(p2.getLayoutBounds())) {
+                ball.setxDirection(xDirection *= -1);
+                ball.setX(x + xDirection);
+            }
+
+            // If the ball goes out of bounds we need to reset and assign points to the correct player
+            if (ball.getX() < 0) {
+                score(p2);
+                playing = false;
+            }
+            else if (ball.getX() > 600) {
+                score(p1);
+                playing = false;
+            }
+        }
+        else if (!playing) {
+            // Reposition the ball and start a countdown until ball is live
+            ball.center();
+            TimerTask play = new TimerTask() {
+                @Override
+                public void run() {
+                    playing = true;
+                }
+            };
+            Timer timer = new Timer();
+            timer.schedule(play, 3000);
         }
 
-        x += xDirection;
-        y += yDirection;
-
-        ball.setX(x);
-        ball.setY(y);
-
-        ball.setCenterX(ball.getX());
-        ball.setCenterY(ball.getY());
-
-        if (ball.getLayoutBounds().intersects(p1.getLayoutBounds()) || ball.getLayoutBounds().intersects(p2.getLayoutBounds())) {
-            ball.setxDirection(xDirection *= -1);
-            ball.setX(x + xDirection);
-        }
-
-        if (ball.getX() < 0) {
-            score(p2);
-            ball.setCenterX(200);
-            this.stop();
-        }
-        else if (ball.getX() > 600) {
-            score(p1);
-            ball.setCenterX(200);
-            this.stop();
-        }
     }
 
     public void score(Paddle player) {
