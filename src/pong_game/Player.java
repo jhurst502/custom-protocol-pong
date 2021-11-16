@@ -3,6 +3,7 @@ package pong_game;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
@@ -42,6 +43,8 @@ public class Player extends Application {
         primaryStage.show();
 
         p1.requestFocus();
+
+        primaryStage.setOnCloseRequest(e -> Platform.exit());
 
         Timeline animation = new Timeline(new KeyFrame(Duration.millis(10),
                 e -> {
