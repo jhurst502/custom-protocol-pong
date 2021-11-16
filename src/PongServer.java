@@ -7,8 +7,8 @@ public class PongServer {
     private int numPlayers;
     private ServerSideConnection player1;
     private ServerSideConnection player2;
-    private int player1Score = 0;
-    private int player2Score = 0;
+    private int player1PaddlePos;
+    private int player2PaddlePos;
 
     public PongServer() {
         System.out.println("----Game Server----");
@@ -37,6 +37,8 @@ public class PongServer {
                 t.start();
             }
             System.out.println("We now have 2 players. No longer accepting connections.");
+            System.out.println("Game starts now.");
+
         } catch (IOException ex) {
             System.out.println("IOException from acceptConnections()");
         }
@@ -56,7 +58,7 @@ public class PongServer {
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
             } catch(IOException ex) {
-                System.out.println("IOEception from SSC constructor");
+                System.out.println("IOException from SSC constructor");
             }
         }
 
@@ -66,10 +68,29 @@ public class PongServer {
                 dataOut.flush();
 
                 while (true) {
-
+                    if (playerID == 1) {
+                        // read int coming from player 1
+                        player1PaddlePos = dataIn.readInt();
+                        // System.out.println("Paddle 1: Y" + player1PaddlePos); // debug
+                        player2.sendPaddlePos(player1PaddlePos);
+                    } else {
+                        // read int coming from player 2
+                        player2PaddlePos = dataIn.readInt();
+                        // System.out.println("Paddle 2: Y" + player2PaddlePos); // debug
+                        player1.sendPaddlePos(player2PaddlePos);
+                    }
                 }
             } catch (IOException ex) {
                 System.out.println("IOException from SSC run()");
+            }
+        }
+
+        public void sendPaddlePos(int n) {
+            try {
+                dataOut.writeInt(n);
+                dataOut.flush();
+            } catch (IOException ex) {
+                System.out.println("IOException from sendPaddlePos() SSC");
             }
         }
     }

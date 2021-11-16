@@ -11,7 +11,7 @@ public class Paddle extends Rectangle {
     public int playerID;
 
     public Paddle(int playerNumber, int winX) {
-        setHeight(70);
+        setHeight(80);
         setWidth(15);
         setFill(Color.WHITE);
         playerID = playerNumber;
@@ -24,14 +24,14 @@ public class Paddle extends Rectangle {
     }
 
     public void moveUp() {
-        setY(getY() - 10); //don't hardcode stage height
+        setY(getY() - 20); //don't hardcode stage height
         if (getY() < 0) {
             setY(0);
         }
     }
 
     public void moveDown(int winY) {
-        setY(getY() + 10);
+        setY(getY() + 20);
         if (getY() + getHeight() > winY) {
             setY(winY - getHeight());
         }

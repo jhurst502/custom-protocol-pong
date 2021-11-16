@@ -16,13 +16,26 @@ import java.net.*;
 
 
 public class Player extends Application {
-    private boolean playing = true;
+    private boolean playing = false;
     public int windowX = 1200;
     public int windowY = 800;
     private int playerID;
     private int otherPlayer;
+    private int myScore = 0;
+    private int enemyScore = 0;
 
     private ClientSideConnection csc;
+
+    public void startReceivingPaddlePos(Paddle otherPaddle) {
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                while (true) {
+                    csc.receivePaddlePos(otherPaddle);
+                }
+            }
+        });
+        t.start();
+    }
 
     // Client Connection Inner Class
     private class ClientSideConnection {
@@ -43,6 +56,29 @@ public class Player extends Application {
                 System.out.println("IOException from CSC constructor");
             }
         }
+
+        // method to send this player's paddle position to the server
+        public void sendPaddlePos(int n) {
+            try {
+                dataOut.writeInt(n);
+                dataOut.flush();;
+            } catch (IOException ex) {
+                System.out.println("IOException from sendPaddlePos() CSC");
+            }
+        }
+
+        // method to receive the other player's paddle position from the server
+        public int receivePaddlePos(Paddle otherPaddle) {
+            int n = -1;
+            try {
+                n = dataIn.readInt();
+                //System.out.println("Paddle " + otherPlayer + ": Y" + n); // debug
+                otherPaddle.setY(n);
+            } catch (IOException ex) {
+                System.out.println("IOExcetpion from receivePaddlePos() CSC");
+            }
+            return n;
+        }
     }
 
     public void connectToServer() {
@@ -50,49 +86,75 @@ public class Player extends Application {
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
         Paddle p1 = new Paddle(1, windowX);
         Paddle p2 = new Paddle(2, windowX);
         Ball ball = new Ball(windowX, windowY);
 
         Pane pane = new Pane(p1, ball, p2);
 
-        if (playerID == 1) {
-            // Can possibly print something on the screen here saying "you are player 1" or something
-            otherPlayer = 2;
-        } else {
-            // and then here something saying "you are player 2"
-            otherPlayer = 1;
-        }
-
         Player p = new Player();
         p.connectToServer();
 
+        if (p.playerID == 1) {
+            // Can possibly print something on the screen here saying "you are player 1" or something
+            p.otherPlayer = 2;
+            // Move the other player's paddle when the other player moves it
+            p.startReceivingPaddlePos(p2);
+        } else {
+            // and then here something saying "you are player 2"
+            p.otherPlayer = 1;
+            // Move the other player's paddle when the other player moves it
+            p.startReceivingPaddlePos(p1);
+        }
+
+        // Paddle movement
         p1.setOnKeyPressed(e -> {
-//            switch (e.getCode()) {
-//                case UP -> p1.moveUp();
-//                case DOWN -> p1.moveDown(windowY);
-//            }
-            if (e.getCode() == KeyCode.UP) {
-                p1.moveUp();
-            }
-            else if (e.getCode() == KeyCode.DOWN) {
-                p1.moveDown(windowY);
+            if (p.playerID == 1) {
+                if (e.getCode() == KeyCode.UP) {
+                    p1.moveUp();
+                    // send new paddle position
+                    p.csc.sendPaddlePos((int)p1.getY());
+                } else if (e.getCode() == KeyCode.DOWN) {
+                    p1.moveDown(windowY);
+                    // send new paddle position
+                    p.csc.sendPaddlePos((int)p1.getY());
+                }
+            } else {
+                if (e.getCode() == KeyCode.UP) {
+                    p2.moveUp();
+                    // send new paddle position
+                    p.csc.sendPaddlePos((int)p2.getY());
+                } else if (e.getCode() == KeyCode.DOWN) {
+                    p2.moveDown(windowY);
+                    // send new paddle position
+                    p.csc.sendPaddlePos((int)p2.getY());
+                }
             }
         });
 
         p1.setOnKeyReleased(e -> {
-            p1.stopMovement();
+            if (p.playerID == 1) {
+                p1.stopMovement();
+            } else {
+                p2.stopMovement();
+            }
         });
+
+        // Window Setup
         pane.setStyle("-fx-background-color: black;");
         pane.setPrefSize(windowX, windowY);
-        primaryStage.setTitle("Player #" + playerID + "Networked Pong");
+        primaryStage.setTitle("Player #" + p.playerID + " Networked Pong");
         primaryStage.setScene(new Scene(pane));
         primaryStage.show();
 
         p1.requestFocus();
 
-        primaryStage.setOnCloseRequest(e -> Platform.exit());
+        // Quit application when window is closed
+        primaryStage.setOnCloseRequest(e -> {
+            Platform.exit();
+            System.exit(0);
+        });
 
         Timeline animation = new Timeline(new KeyFrame(Duration.millis(10),
                 e -> {
