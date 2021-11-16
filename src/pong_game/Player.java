@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class Main extends Application {
+public class Player extends Application {
     private boolean playing = true;
     public int windowX = 1200;
     public int windowY = 800;
