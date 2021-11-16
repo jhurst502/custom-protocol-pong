@@ -5,18 +5,45 @@ import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-
 import java.util.Timer;
 import java.util.TimerTask;
+import java.io.*;
+import java.net.*;
 
 
 public class Player extends Application {
     private boolean playing = true;
     public int windowX = 1200;
     public int windowY = 800;
+
+    private ClientSideConnection csc;
+
+    // Client Connection Inner Class
+    private class ClientSideConnection {
+
+        private Socket socket;
+        private DataInputStream dataIn;
+        private DataOutputStream dataOut;
+
+        public ClientSideConnection() {
+            System.out.println("----Client----");
+            try {
+                socket = new Socket("localhost", 51734); // exact same port as in PongServer Constructor
+                dataIn = new DataInputStream(socket.getInputStream());
+                dataOut = new DataOutputStream(socket.getOutputStream());
+            } catch (IOException ex) {
+                System.out.println("IOException from CSC constructor");
+            }
+        }
+    }
+
+    public void connectToServer() {
+        csc = new ClientSideConnection();
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -26,10 +53,19 @@ public class Player extends Application {
 
         Pane pane = new Pane(p1, ball, p2);
 
+        Player p = new Player();
+        p.connectToServer();
+
         p1.setOnKeyPressed(e -> {
-            switch (e.getCode()) {
-                case UP -> p1.moveUp();
-                case DOWN -> p1.moveDown(windowY);
+//            switch (e.getCode()) {
+//                case UP -> p1.moveUp();
+//                case DOWN -> p1.moveDown(windowY);
+//            }
+            if (e.getCode() == KeyCode.UP) {
+                p1.moveUp();
+            }
+            else if (e.getCode() == KeyCode.DOWN) {
+                p1.moveDown(windowY);
             }
         });
 
@@ -57,7 +93,6 @@ public class Player extends Application {
         animation.setCycleCount(Timeline.INDEFINITE);
         animation.play();
     }
-
 
     public static void main(String[] args) {
         launch(args);
