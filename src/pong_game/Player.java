@@ -19,6 +19,8 @@ public class Player extends Application {
     private boolean playing = true;
     public int windowX = 1200;
     public int windowY = 800;
+    private int playerID;
+    private int otherPlayer;
 
     private ClientSideConnection csc;
 
@@ -35,6 +37,8 @@ public class Player extends Application {
                 socket = new Socket("localhost", 51734); // exact same port as in PongServer Constructor
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
+                playerID = dataIn.readInt(); // first read in client
+                System.out.println("Connected to server as Player #" + playerID + ".");
             } catch (IOException ex) {
                 System.out.println("IOException from CSC constructor");
             }
@@ -52,6 +56,14 @@ public class Player extends Application {
         Ball ball = new Ball(windowX, windowY);
 
         Pane pane = new Pane(p1, ball, p2);
+
+        if (playerID == 1) {
+            // Can possibly print something on the screen here saying "you are player 1" or something
+            otherPlayer = 2;
+        } else {
+            // and then here something saying "you are player 2"
+            otherPlayer = 1;
+        }
 
         Player p = new Player();
         p.connectToServer();
@@ -74,7 +86,7 @@ public class Player extends Application {
         });
         pane.setStyle("-fx-background-color: black;");
         pane.setPrefSize(windowX, windowY);
-        primaryStage.setTitle("Peer to Peer Pong");
+        primaryStage.setTitle("Player #" + playerID + "Networked Pong");
         primaryStage.setScene(new Scene(pane));
         primaryStage.show();
 
@@ -147,8 +159,8 @@ public class Player extends Application {
 
     }
 
-    public void score(Paddle player) {
-        player.score += 1;
-        System.out.println("Player #" + player.playerID + " score: " + player.score);
+    public void score(Paddle paddle) {
+        paddle.score += 1;
+        System.out.println("Player #" + paddle.playerID + " score: " + paddle.score);
     }
 }
