@@ -21,7 +21,6 @@ public class Player extends Application {
     private int otherPlayer; // not sure if this variable might be useful or not.
                             // I'm not using it for anything rly so if you don't use it for anu GUI stuff feel free to remove
     private boolean receiving = true;
-    private boolean connectionFailed = false;
 
     private ClientSideConnection csc;
 
@@ -53,7 +52,6 @@ public class Player extends Application {
                 System.out.println("Connected to server as Player #" + playerID + ".");
             } catch (IOException ex) {
                 System.out.println("IOException from CSC constructor");
-                connectionFailed = true;
             }
         }
 
@@ -108,7 +106,6 @@ public class Player extends Application {
 
         Player p = new Player();
         p.connectToServer();
-
 
 
         if (p.playerID == 1) {
