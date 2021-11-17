@@ -71,13 +71,21 @@ public class PongServer {
                     if (playerID == 1) {
                         // read int coming from player 1
                         player1PaddlePos = dataIn.readInt();
+                        if (player1PaddlePos == -1) {
+                            break;
+                        }
                         player2.sendPaddlePos(player1PaddlePos);
                     } else {
                         // read int coming from player 2
                         player2PaddlePos = dataIn.readInt();
+                        if (player2PaddlePos == -1) {
+                            break;
+                        }
                         player1.sendPaddlePos(player2PaddlePos);
                     }
                 }
+                player1.closeConnection();
+                player2.closeConnection();
             } catch (IOException ex) {
                 System.out.println("IOException from SSC run()");
             }
@@ -89,6 +97,15 @@ public class PongServer {
                 dataOut.flush();
             } catch (IOException ex) {
                 System.out.println("IOException from sendPaddlePos() SSC");
+            }
+        }
+
+        public void closeConnection() {
+            try {
+                socket.close();
+                System.out.println("Connection closed");
+            } catch (IOException ex) {
+                System.out.println("IOException on closeConnection() SSC");
             }
         }
     }

@@ -20,23 +20,21 @@ public class Player extends Application {
     public int windowX = 1200;
     public int windowY = 800;
     private int playerID;
-    private int otherPlayer;
+    private int otherPlayer; // not sure if this variable might be useful or not.
+                            // I'm not using it for anything rly so if you don't use it for anu GUI stuff feel free to remove
+    private boolean receiving = true;
 
     private ClientSideConnection csc;
 
     public void startReceivingPaddlePos(Paddle otherPaddle) {
         Thread t = new Thread(new Runnable() {
             public void run() {
-                while (true) {
+                while (receiving) {
                     csc.receivePaddlePos(otherPaddle);
                 }
             }
         });
         t.start();
-    }
-
-    private void checkWinner() {
-
     }
 
     // Client Connection Inner Class
@@ -62,8 +60,13 @@ public class Player extends Application {
         // method to send this player's paddle position to the server
         public void sendPaddlePos(int n) {
             try {
-                dataOut.writeInt(n);
-                dataOut.flush();;
+                if (receiving) {
+                    dataOut.writeInt(n);
+                    dataOut.flush();
+                } else { // if game is over send signal to server
+                    dataOut.writeInt(-1);
+                    dataOut.flush();
+                }
             } catch (IOException ex) {
                 System.out.println("IOException from sendPaddlePos() CSC");
             }
@@ -74,12 +77,20 @@ public class Player extends Application {
             int n = -1;
             try {
                 n = dataIn.readInt();
-                //System.out.println("Paddle " + otherPlayer + ": Y" + n); // debug
                 otherPaddle.setY(n);
             } catch (IOException ex) {
                 System.out.println("IOException from receivePaddlePos() CSC");
             }
             return n;
+        }
+
+        public void closeConnection() {
+            try {
+                socket.close();
+                System.out.println("----CONNECTION CLOSED----");
+            } catch (IOException ex) {
+                System.out.println("IOException from closeConnection() CSC");
+            }
         }
     }
 
@@ -164,7 +175,7 @@ public class Player extends Application {
             Timeline animation = new Timeline(new KeyFrame(Duration.millis(10),
                     e -> {
                         try {
-                            moveBall(ball, p1, p2);
+                            moveBall(ball, p1, p2, p);
                         } catch (Exception exception) {
                             exception.printStackTrace();
                         }
@@ -178,7 +189,7 @@ public class Player extends Application {
         launch(args);
     }
 
-    public void moveBall(Ball ball, Paddle p1, Paddle p2) throws Exception {
+    public void moveBall(Ball ball, Paddle p1, Paddle p2, Player p) throws Exception {
         // only start ball movement once p2 has moved
         // if p2 has moved, that means both players are connected to the server
         // stop moving the ball once a player has more than 5 points (they win)
@@ -207,11 +218,11 @@ public class Player extends Application {
 
             // If the ball goes out of bounds we need to reset and assign points to the correct player
             if (ball.getX() < 0) {
-                score(p2);
+                score(p2, p);
                 playing = false;
             }
             else if (ball.getX() > windowX) {
-                score(p1);
+                score(p1, p);
                 playing = false;
             }
         }
@@ -230,13 +241,15 @@ public class Player extends Application {
 
     }
 
-    public void score(Paddle paddle) {
+    public void score(Paddle paddle, Player p) {
         paddle.score += 1;
         System.out.println("Player #" + paddle.playerID + " score: " + paddle.score);
         // If a player has won
         if (paddle.score >= 5) {
             // stop the game
             System.out.println("Player #" + paddle.playerID + " has won the game!");
+            p.receiving = false;
+            p.csc.closeConnection();
         }
     }
 }
