@@ -71,12 +71,10 @@ public class PongServer {
                     if (playerID == 1) {
                         // read int coming from player 1
                         player1PaddlePos = dataIn.readInt();
-                        // System.out.println("Paddle 1: Y" + player1PaddlePos); // debug
                         player2.sendPaddlePos(player1PaddlePos);
                     } else {
                         // read int coming from player 2
                         player2PaddlePos = dataIn.readInt();
-                        // System.out.println("Paddle 2: Y" + player2PaddlePos); // debug
                         player1.sendPaddlePos(player2PaddlePos);
                     }
                 }

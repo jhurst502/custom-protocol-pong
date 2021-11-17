@@ -16,13 +16,11 @@ import java.net.*;
 
 
 public class Player extends Application {
-    private boolean playing = false;
+    private boolean playing = true;
     public int windowX = 1200;
     public int windowY = 800;
     private int playerID;
     private int otherPlayer;
-    private int myScore = 0;
-    private int enemyScore = 0;
 
     private ClientSideConnection csc;
 
@@ -35,6 +33,10 @@ public class Player extends Application {
             }
         });
         t.start();
+    }
+
+    private void checkWinner() {
+
     }
 
     // Client Connection Inner Class
@@ -75,7 +77,7 @@ public class Player extends Application {
                 //System.out.println("Paddle " + otherPlayer + ": Y" + n); // debug
                 otherPaddle.setY(n);
             } catch (IOException ex) {
-                System.out.println("IOExcetpion from receivePaddlePos() CSC");
+                System.out.println("IOException from receivePaddlePos() CSC");
             }
             return n;
         }
@@ -144,7 +146,7 @@ public class Player extends Application {
         // Window Setup
         pane.setStyle("-fx-background-color: black;");
         pane.setPrefSize(windowX, windowY);
-        primaryStage.setTitle("Player #" + p.playerID + " Networked Pong");
+        primaryStage.setTitle("Player #" + p.playerID + " Networked Multiplayer Pong");
         primaryStage.setScene(new Scene(pane));
         primaryStage.show();
 
@@ -156,16 +158,20 @@ public class Player extends Application {
             System.exit(0);
         });
 
-        Timeline animation = new Timeline(new KeyFrame(Duration.millis(10),
-                e -> {
-                    try {
-                        moveBall(ball, p1, p2);
-                    } catch (Exception exception) {
-                        exception.printStackTrace();
-                    }
-                }));
-        animation.setCycleCount(Timeline.INDEFINITE);
-        animation.play();
+
+        // Ball Movement
+        if (playing) {
+            Timeline animation = new Timeline(new KeyFrame(Duration.millis(10),
+                    e -> {
+                        try {
+                            moveBall(ball, p1, p2);
+                        } catch (Exception exception) {
+                            exception.printStackTrace();
+                        }
+                    }));
+            animation.setCycleCount(Timeline.INDEFINITE);
+            animation.play();
+        }
     }
 
     public static void main(String[] args) {
@@ -173,7 +179,10 @@ public class Player extends Application {
     }
 
     public void moveBall(Ball ball, Paddle p1, Paddle p2) throws Exception {
-        if (playing) {
+        // only start ball movement once p2 has moved
+        // if p2 has moved, that means both players are connected to the server
+        // stop moving the ball once a player has more than 5 points (they win)
+        if (playing && p2.getY() != 0 && p1.score < 5 && p2.score < 5) {
             double yDirection = ball.getyDirection();
             double xDirection = ball.getxDirection();
             int x = ball.getX();
@@ -224,5 +233,10 @@ public class Player extends Application {
     public void score(Paddle paddle) {
         paddle.score += 1;
         System.out.println("Player #" + paddle.playerID + " score: " + paddle.score);
+        // If a player has won
+        if (paddle.score >= 5) {
+            // stop the game
+            System.out.println("Player #" + paddle.playerID + " has won the game!");
+        }
     }
 }
