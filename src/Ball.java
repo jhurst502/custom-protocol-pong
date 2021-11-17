@@ -1,5 +1,3 @@
-package pong_game;
-
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 
@@ -8,8 +6,8 @@ public class Ball extends Circle {
     private double radius = 12;
     private int x; // Dont hardcode screen size
     private int y;
-    private double xDirection = -3.5;
-    private double yDirection = 3.5;
+    private double xDirection = -3.5; // -3.5 seems like a good speed to me, feel free to change
+    private double yDirection = 3.5; // 3.5 eems like a good speed to me, feel free to change
 
     public Ball(int winX, int winY) {
         setRadius(radius);
