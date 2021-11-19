@@ -1,3 +1,5 @@
+import javax.swing.*;
+import java.awt.*;
 import java.io.*;
 import java.net.*;
 
@@ -9,22 +11,30 @@ public class PongServer {
     private ServerSideConnection player2;
     private int player1PaddlePos;
     private int player2PaddlePos;
+    private String hostName;
 
     public PongServer() {
         System.out.println("----Game Server----");
         numPlayers = 0;
         int port = 51734; // same port as in player CSC Constructor
         try {
-            //String inetAddress = InetAddress.getByName("ZION-PC").getHostAddress();
-            //ss = new ServerSocket(port, 2, inetAddress);
-            //SocketAddress endpoint = new InetSocketAddress(inetAddress, port);
-            //ss.bind(endpoint);
             ss = new ServerSocket(port);
-            System.out.println("Current IP address: " + InetAddress.getLocalHost());
-            System.out.println("Current Hostname: " + InetAddress.getLocalHost().getHostName());
+            hostName = InetAddress.getLocalHost().getHostAddress();
+            displayWindow(hostName);
+            System.out.println("Current IP address: " + hostName);
         } catch (IOException ex) {
             System.out.println("IOException from PongServer Constructor");
         }
+    }
+
+    public void displayWindow(String hostName) {
+        JFrame frame = new JFrame("Pong Server");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setPreferredSize(new Dimension(400, 300));
+        frame.pack();
+        JLabel label = new JLabel("IP address: " + hostName, SwingConstants.CENTER);
+        frame.getContentPane().add(label);
+        frame.setVisible(true);
     }
 
     public void acceptConnections() {

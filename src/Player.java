@@ -43,7 +43,7 @@ public class Player extends Application {
         private DataOutputStream dataOut;
 
         public ClientSideConnection() {
-            String host = "localhost";
+            String host = "100.72.109.115";
             int port = 51734; // exact same port as in PongServer Constructor
             System.out.println("----Client----");
             try {
