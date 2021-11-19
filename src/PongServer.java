@@ -16,9 +16,8 @@ public class PongServer {
     public PongServer() {
         System.out.println("----Game Server----");
         numPlayers = 0;
-        int port = 51734; // same port as in player CSC Constructor
         try {
-            ss = new ServerSocket(port);
+            ss = new ServerSocket(51734); // same port as in player CSC Constructor
             hostName = InetAddress.getLocalHost().getHostAddress();
             displayWindow(hostName);
             System.out.println("Current IP address: " + hostName);

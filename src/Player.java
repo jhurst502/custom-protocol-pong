@@ -7,6 +7,8 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+
+import javax.swing.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.io.*;
@@ -43,11 +45,13 @@ public class Player extends Application {
         private DataOutputStream dataOut;
 
         public ClientSideConnection() {
-            String host = "100.72.109.115";
-            int port = 51734; // exact same port as in PongServer Constructor
             System.out.println("----Client----");
+            // Prompt the user to input the IP address of the server
+            String host = JOptionPane.showInputDialog("Input server IP address:");
             try {
-                socket = new Socket(host, port);
+                // connect to the server address that the user inputted
+                // has to be the exact same port as in PongServer Constructor
+                socket = new Socket(host, 51734);
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
                 playerID = dataIn.readInt(); // first read in client
