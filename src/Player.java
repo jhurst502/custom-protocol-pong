@@ -43,9 +43,11 @@ public class Player extends Application {
         private DataOutputStream dataOut;
 
         public ClientSideConnection() {
+            String host = "localhost";
+            int port = 51734; // exact same port as in PongServer Constructor
             System.out.println("----Client----");
             try {
-                socket = new Socket("localhost", 51734); // exact same port as in PongServer Constructor
+                socket = new Socket(host, port);
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
                 playerID = dataIn.readInt(); // first read in client

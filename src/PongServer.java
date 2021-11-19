@@ -13,8 +13,15 @@ public class PongServer {
     public PongServer() {
         System.out.println("----Game Server----");
         numPlayers = 0;
+        int port = 51734; // same port as in player CSC Constructor
         try {
-            ss = new ServerSocket(51734); // same as in player CSC Constructor
+            //String inetAddress = InetAddress.getByName("ZION-PC").getHostAddress();
+            //ss = new ServerSocket(port, 2, inetAddress);
+            //SocketAddress endpoint = new InetSocketAddress(inetAddress, port);
+            //ss.bind(endpoint);
+            ss = new ServerSocket(port);
+            System.out.println("Current IP address: " + InetAddress.getLocalHost());
+            System.out.println("Current Hostname: " + InetAddress.getLocalHost().getHostName());
         } catch (IOException ex) {
             System.out.println("IOException from PongServer Constructor");
         }
