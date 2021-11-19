@@ -198,7 +198,7 @@ public class Player extends Application {
         // only start ball movement once p2 has moved
         // if p2 has moved, that means both players are connected to the server
         // stop moving the ball once a player has more than 5 points (they win)
-        if (playing && p2.getY() != 0 && p1.score < 5 && p2.score < 5) {
+        if (playing && p2.getY() != -1 && p1.score < 5 && p2.score < 5) {
             double yDirection = ball.getyDirection();
             double xDirection = ball.getxDirection();
             int x = ball.getX();

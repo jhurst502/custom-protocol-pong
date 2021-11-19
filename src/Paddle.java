@@ -4,8 +4,6 @@ import javafx.scene.shape.Rectangle;
 public class Paddle extends Rectangle {
 
     public int score;
-    private int x;
-    private int y;
     public int playerID;
 
     public Paddle(int playerNumber, int winX) {
@@ -13,6 +11,7 @@ public class Paddle extends Rectangle {
         setWidth(15);
         setFill(Color.WHITE);
         playerID = playerNumber;
+        setY(-1);
 
         if (playerNumber == 1) {
             setX(0);
