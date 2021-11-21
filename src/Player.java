@@ -2,13 +2,24 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.*;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import javax.swing.*;
+import javax.swing.text.Position;
+import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.io.*;
@@ -66,11 +77,10 @@ public class Player extends Application {
             try {
                 if (receiving) {
                     dataOut.writeInt(n);
-                    dataOut.flush();
                 } else { // if game is over send signal to server
                     dataOut.writeInt(-1);
-                    dataOut.flush();
                 }
+                dataOut.flush();
             } catch (IOException ex) {
                 System.out.println("IOException from sendPaddlePos() CSC");
             }
@@ -108,10 +118,33 @@ public class Player extends Application {
         Paddle p2 = new Paddle(2, windowX);
         Ball ball = new Ball(windowX, windowY);
 
-        Pane pane = new Pane(p1, ball, p2);
+
+        // Scoreboard
+        Text p1Score = new Text("Player One: " + p1.score);;
+        p1Score.setFill(Color.WHITE);
+        p1Score.setFont(Font.font(30));
+        p1Score.setFontSmoothingType(FontSmoothingType.LCD);
+        p1Score.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
+
+        Text p2Score = new Text("Player Two: " + p2.score);;
+        p2Score.setFill(Color.WHITE);
+        p2Score.setFont(Font.font("Verdana", FontWeight.BOLD, 30));
+        p2Score.setFontSmoothingType(FontSmoothingType.LCD);
+
+        HBox hBox = new HBox(100);
+        hBox.setPadding(new Insets(15, 12, 15, windowX/4));
+        hBox.getChildren().addAll(p1Score, p2Score);
+        hBox.setAlignment(Pos.CENTER);
+
+        Pane playingField = new Pane(p1, ball, p2);
 
         Player p = new Player();
         p.connectToServer();
+
+        StackPane rootPane = new StackPane();
+        Scene scene = new Scene(rootPane);
+        Pane scoreBoard = new Pane(hBox);
+        rootPane.getChildren().addAll(playingField, scoreBoard);
 
 
         if (p.playerID == 1) {
@@ -160,10 +193,10 @@ public class Player extends Application {
         });
 
         // Window Setup
-        pane.setStyle("-fx-background-color: black;");
-        pane.setPrefSize(windowX, windowY);
+        playingField.setStyle("-fx-background-color: black;");
+        playingField.setPrefSize(windowX, windowY);
         primaryStage.setTitle("Player #" + p.playerID + " Networked Multiplayer Pong");
-        primaryStage.setScene(new Scene(pane));
+        primaryStage.setScene(scene);
         primaryStage.show();
 
         p1.requestFocus();
@@ -180,7 +213,7 @@ public class Player extends Application {
             Timeline animation = new Timeline(new KeyFrame(Duration.millis(10),
                     e -> {
                         try {
-                            moveBall(ball, p1, p2, p);
+                            moveBall(ball, p1, p2, p, p1Score, p2Score);
                         } catch (Exception exception) {
                             exception.printStackTrace();
                         }
@@ -194,7 +227,7 @@ public class Player extends Application {
         launch(args);
     }
 
-    public void moveBall(Ball ball, Paddle p1, Paddle p2, Player p) throws Exception {
+    public void moveBall(Ball ball, Paddle p1, Paddle p2, Player p, Text p1Score, Text p2Score) throws Exception {
         // only start ball movement once p2 has moved
         // if p2 has moved, that means both players are connected to the server
         // stop moving the ball once a player has more than 5 points (they win)
@@ -223,11 +256,11 @@ public class Player extends Application {
 
             // If the ball goes out of bounds we need to reset and assign points to the correct player
             if (ball.getX() < 0) {
-                score(p2, p);
+                score(p2, p, p1Score, p2Score);
                 playing = false;
             }
             else if (ball.getX() > windowX) {
-                score(p1, p);
+                score(p1, p, p1Score, p2Score);
                 playing = false;
             }
         }
@@ -246,12 +279,19 @@ public class Player extends Application {
 
     }
 
-    public void score(Paddle paddle, Player p) {
+    public void score(Paddle paddle, Player p, Text p1Score, Text p2Score) {
         paddle.score += 1;
         System.out.println("Player #" + paddle.playerID + " score: " + paddle.score);
+        if (paddle.playerID == 1) {
+            p1Score.setText("Player One: " + paddle.score);
+        } else {
+            p2Score.setText("Player Two: " + paddle.score);
+        }
         // If a player has won
         if (paddle.score >= 5) {
             // stop the game
+            p1Score.setText("Player #" + paddle.playerID );
+            p2Score.setText(" has won the game!");
             System.out.println("Player #" + paddle.playerID + " has won the game!");
             p.receiving = false;
             p.csc.closeConnection();
