@@ -5,12 +5,10 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
 import javafx.scene.input.KeyCode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.scene.text.Font;
@@ -18,8 +16,6 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import javax.swing.*;
-import javax.swing.text.Position;
-import java.awt.*;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.io.*;
@@ -185,10 +181,12 @@ public class Player extends Application {
         });
 
         p1.setOnKeyReleased(e -> {
-            if (p.playerID == 1) {
-                p1.stopMovement();
-            } else {
-                p2.stopMovement();
+            if (e.getCode() == KeyCode.DOWN || e.getCode() == KeyCode.UP) {
+                if (p.playerID == 1) {
+                    p1.stopMovement();
+                } else {
+                    p2.stopMovement();
+                }
             }
         });
 
