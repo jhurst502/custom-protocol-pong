@@ -1,3 +1,5 @@
+package application;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
@@ -22,7 +24,7 @@ public class PongServer {
             displayWindow(hostName);
             System.out.println("Current IP address: " + hostName);
         } catch (IOException ex) {
-            System.out.println("IOException from PongServer Constructor");
+            System.out.println("IOException from application.PongServer Constructor");
         }
     }
 
@@ -42,7 +44,7 @@ public class PongServer {
             while (numPlayers < 2) {
                 Socket s = ss.accept();
                 numPlayers++;
-                System.out.println("Player #" + numPlayers + " has connected.");
+                System.out.println("application.Player #" + numPlayers + " has connected.");
                 ServerSideConnection ssc = new ServerSideConnection(s, numPlayers); // numPlayers functions as the playerID here
                 if (numPlayers == 1) {
                     player1 = ssc;

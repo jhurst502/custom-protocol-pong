@@ -1,3 +1,5 @@
+package application;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -57,12 +59,12 @@ public class Player extends Application {
             String host = JOptionPane.showInputDialog("Input server IP address:");
             try {
                 // connect to the server address that the user inputted
-                // has to be the exact same port as in PongServer Constructor
+                // has to be the exact same port as in application.PongServer Constructor
                 socket = new Socket(host, 51734);
                 dataIn = new DataInputStream(socket.getInputStream());
                 dataOut = new DataOutputStream(socket.getOutputStream());
                 playerID = dataIn.readInt(); // first read in client
-                System.out.println("Connected to server as Player #" + playerID + ".");
+                System.out.println("Connected to server as application.Player #" + playerID + ".");
             } catch (IOException ex) {
                 System.out.println("IOException from CSC constructor");
             }
@@ -155,7 +157,7 @@ public class Player extends Application {
             p.startReceivingPaddlePos(p1);
         }
 
-        // Paddle movement
+        // application.Paddle movement
         p1.setOnKeyPressed(e -> {
             if (p.playerID == 1) {
                 if (e.getCode() == KeyCode.UP) {
@@ -206,7 +208,7 @@ public class Player extends Application {
         });
 
 
-        // Ball Movement
+        // application.Ball Movement
         if (playing) {
             Timeline animation = new Timeline(new KeyFrame(Duration.millis(10),
                     e -> {
